@@ -1,6 +1,6 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-import pandas as pd
+import numpy as np
 
 # Title
 st.title("Waste Heat Recovery Simulator")
@@ -21,68 +21,49 @@ recovery_efficiency2 = st.sidebar.slider("Recovery Efficiency (%) - Case 2", 0, 
 base_energy2 = st.sidebar.slider("Base Energy Consumption (kWh/ton) - Case 2", 500, 2000, 1200)
 
 st.sidebar.subheader("Case 3")
-exhaust_air_used3 = st.sidebar.slider("Exhaust Air Used (%) - Case 3", 0, 100, 70)
-exhaust_temp3 = st.sidebar.slider("Exhaust Temperature (°C) - Case 3", 100, 600, 400)
-recovery_efficiency3 = st.sidebar.slider("Recovery Efficiency (%) - Case 3", 0, 100, 80)
-base_energy3 = st.sidebar.slider("Base Energy Consumption (kWh/ton) - Case 3", 500, 2000, 1500)
+exhaust_air_used3 = st.sidebar.slider("Exhaust Air Used (%) - Case 3", 0, 100, 40)
+exhaust_temp3 = st.sidebar.slider("Exhaust Temperature (°C) - Case 3", 100, 600, 250)
+recovery_efficiency3 = st.sidebar.slider("Recovery Efficiency (%) - Case 3", 0, 100, 65)
+base_energy3 = st.sidebar.slider("Base Energy Consumption (kWh/ton) - Case 3", 500, 2000, 900)
 
 # Fixed thermal energy cost
-thermal_energy_cost = 1.2
+thermal_energy_cost_per_kwh = 1.2
 
-# Calculation function
+# Function to calculate savings
 def calculate_savings(exhaust_air_used, recovery_efficiency, base_energy, cost_per_kwh):
     usable_energy_fraction = (exhaust_air_used / 100) * (recovery_efficiency / 100)
     energy_saved = base_energy * usable_energy_fraction
     cost_saved = energy_saved * cost_per_kwh
-    return round(energy_saved, 1), round(cost_saved, 1)
+    return energy_saved, cost_saved
 
 # Calculate for each case
-energy1, cost1 = calculate_savings(exhaust_air_used1, recovery_efficiency1, base_energy1, thermal_energy_cost)
-energy2, cost2 = calculate_savings(exhaust_air_used2, recovery_efficiency2, base_energy2, thermal_energy_cost)
-energy3, cost3 = calculate_savings(exhaust_air_used3, recovery_efficiency3, base_energy3, thermal_energy_cost)
+energy1, cost1 = calculate_savings(exhaust_air_used1, recovery_efficiency1, base_energy1, thermal_energy_cost_per_kwh)
+energy2, cost2 = calculate_savings(exhaust_air_used2, recovery_efficiency2, base_energy2, thermal_energy_cost_per_kwh)
+energy3, cost3 = calculate_savings(exhaust_air_used3, recovery_efficiency3, base_energy3, thermal_energy_cost_per_kwh)
 
-# Prepare data for table
+# Display results in a table
+st.subheader("Simulation Summary Table")
+import pandas as pd
+
 data = {
-    "Case 1": {
-        "Exhaust Air Used (%)": exhaust_air_used1,
-        "Exhaust Temperature (°C)": exhaust_temp1,
-        "Recovery Efficiency (%)": recovery_efficiency1,
-        "Base Energy (kWh/ton)": base_energy1,
-        "Energy Saved (kWh/ton)": energy1,
-        "Cost Saved (INR/ton)": cost1
-    },
-    "Case 2": {
-        "Exhaust Air Used (%)": exhaust_air_used2,
-        "Exhaust Temperature (°C)": exhaust_temp2,
-        "Recovery Efficiency (%)": recovery_efficiency2,
-        "Base Energy (kWh/ton)": base_energy2,
-        "Energy Saved (kWh/ton)": energy2,
-        "Cost Saved (INR/ton)": cost2
-    },
-    "Case 3": {
-        "Exhaust Air Used (%)": exhaust_air_used3,
-        "Exhaust Temperature (°C)": exhaust_temp3,
-        "Recovery Efficiency (%)": recovery_efficiency3,
-        "Base Energy (kWh/ton)": base_energy3,
-        "Energy Saved (kWh/ton)": energy3,
-        "Cost Saved (INR/ton)": cost3
-    }
+    "Case": ["Case 1", "Case 2", "Case 3"],
+    "Exhaust Air Used (%)": [exhaust_air_used1, exhaust_air_used2, exhaust_air_used3],
+    "Exhaust Temp (°C)": [exhaust_temp1, exhaust_temp2, exhaust_temp3],
+    "Recovery Efficiency (%)": [recovery_efficiency1, recovery_efficiency2, recovery_efficiency3],
+    "Base Energy (kWh/ton)": [base_energy1, base_energy2, base_energy3],
+    "Energy Saved (kWh/ton)": [round(energy1, 2), round(energy2, 2), round(energy3, 2)],
+    "Cost Saved (INR/ton)": [round(cost1, 2), round(cost2, 2), round(cost3, 2)]
 }
 
-# Convert to DataFrame and transpose
-df = pd.DataFrame(data).round(1).astype(str).transpose()
-
-# Display table
-st.subheader("Simulation Summary Table")
-st.dataframe(df.style.set_properties(**{'color': 'black'}))
+df = pd.DataFrame(data)
+st.dataframe(df)
 
 # Bar chart for cost saved
-st.subheader("Cost Saved Comparison")
+st.subheader("Cost Saved Comparison (INR/ton)")
 fig, ax = plt.subplots()
-cases = ['Case 1', 'Case 2', 'Case 3']
+cases = ["Case 1", "Case 2", "Case 3"]
 costs = [cost1, cost2, cost3]
-colors = ['#FD5108', '#FE7C39', '#FFAA72']
-ax.bar(cases, costs, color=colors)
+ax.bar(cases, costs, color='green')
 ax.set_ylabel("Cost Saved (INR/ton)")
-ax.set_title("Cost Saved per Case")
+ax.set_title("Cost Savings Across Cases")
 st.pyplot(fig)
