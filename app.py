@@ -70,7 +70,7 @@ data = {
 }
 
 # Convert to DataFrame and transpose
-df = pd.DataFrame(data).round(1).astype(str).transpose()
+df = pd.DataFrame(data).round(1).astype(str)
 
 # Display table
 st.subheader("Simulation Summary Table")
