@@ -26,8 +26,8 @@ exhaust_temp3 = st.sidebar.slider("Exhaust Temperature (°C) - Case 3", 100, 600
 recovery_efficiency3 = st.sidebar.slider("Recovery Efficiency (%) - Case 3", 0, 100, 80)
 base_energy3 = st.sidebar.slider("Base Energy Consumption (kWh/ton) - Case 3", 500, 2000, 1500)
 
-# Constants
-thermal_energy_cost = 1.2  # INR/kWh
+# Fixed thermal energy cost
+thermal_cost_per_kwh = 1.2
 
 # Calculation function
 def calculate_savings(exhaust_air_used, exhaust_temp, recovery_efficiency, base_energy, cost_per_kwh):
@@ -37,44 +37,22 @@ def calculate_savings(exhaust_air_used, exhaust_temp, recovery_efficiency, base_
     return energy_saved, cost_saved
 
 # Calculate for each case
-energy1, cost1 = calculate_savings(exhaust_air_used1, exhaust_temp1, recovery_efficiency1, base_energy1, thermal_energy_cost)
-energy2, cost2 = calculate_savings(exhaust_air_used2, exhaust_temp2, recovery_efficiency2, base_energy2, thermal_energy_cost)
-energy3, cost3 = calculate_savings(exhaust_air_used3, exhaust_temp3, recovery_efficiency3, base_energy3, thermal_energy_cost)
+energy1, cost1 = calculate_savings(exhaust_air_used1, exhaust_temp1, recovery_efficiency1, base_energy1, thermal_cost_per_kwh)
+energy2, cost2 = calculate_savings(exhaust_air_used2, exhaust_temp2, recovery_efficiency2, base_energy2, thermal_cost_per_kwh)
+energy3, cost3 = calculate_savings(exhaust_air_used3, exhaust_temp3, recovery_efficiency3, base_energy3, thermal_cost_per_kwh)
 
-# Prepare data for transposed table
+# Create DataFrame
 data = {
-    "Case 1": {
-        "Exhaust Air Used (%)": exhaust_air_used1,
-        "Exhaust Temperature (°C)": exhaust_temp1,
-        "Recovery Efficiency (%)": recovery_efficiency1,
-        "Base Energy (kWh/ton)": base_energy1,
-        "Energy Saved (kWh/ton)": round(energy1, 1),
-        "Cost Saved (INR/ton)": round(cost1, 1)
-    },
-    "Case 2": {
-        "Exhaust Air Used (%)": exhaust_air_used2,
-        "Exhaust Temperature (°C)": exhaust_temp2,
-        "Recovery Efficiency (%)": recovery_efficiency2,
-        "Base Energy (kWh/ton)": base_energy2,
-        "Energy Saved (kWh/ton)": round(energy2, 1),
-        "Cost Saved (INR/ton)": round(cost2, 1)
-    },
-    "Case 3": {
-        "Exhaust Air Used (%)": exhaust_air_used3,
-        "Exhaust Temperature (°C)": exhaust_temp3,
-        "Recovery Efficiency (%)": recovery_efficiency3,
-        "Base Energy (kWh/ton)": base_energy3,
-        "Energy Saved (kWh/ton)": round(energy3, 1),
-        "Cost Saved (INR/ton)": round(cost3, 1)
-    }
+    "Case 1": [exhaust_air_used1, exhaust_temp1, recovery_efficiency1, base_energy1, round(energy1, 1), round(cost1, 1)],
+    "Case 2": [exhaust_air_used2, exhaust_temp2, recovery_efficiency2, base_energy2, round(energy2, 1), round(cost2, 1)],
+    "Case 3": [exhaust_air_used3, exhaust_temp3, recovery_efficiency3, base_energy3, round(energy3, 1), round(cost3, 1)]
 }
+index = ["Exhaust Air Used (%)", "Exhaust Temperature (°C)", "Recovery Efficiency (%)", "Base Energy (kWh/ton)", "Energy Saved (kWh/ton)", "Cost Saved (INR/ton)"]
+df = pd.DataFrame(data, index=index)
 
-df = pd.DataFrame(data)
-df_styled = df.style.set_properties(**{'color': 'black'})
-
-# Display transposed table
-st.subheader("Simulation Summary Table")
-st.dataframe(df_styled.transpose())
+# Display transposed table with black font
+st.subheader("Simulation Summary")
+st.dataframe(df.style.set_properties(**{'color': 'black'}))
 
 # Bar chart for cost saved
 st.subheader("Cost Saved Comparison")
@@ -84,5 +62,5 @@ costs = [cost1, cost2, cost3]
 colors = ['#FD5108', '#FE7C39', '#FFAA72']
 ax.bar(cases, costs, color=colors)
 ax.set_ylabel("Cost Saved (INR/ton)")
-ax.set_title("Cost Saved by Case")
+ax.set_title("Cost Saved Across Cases")
 st.pyplot(fig)
