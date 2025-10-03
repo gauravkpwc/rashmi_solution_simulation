@@ -1,5 +1,3 @@
-# Fixed Streamlit code for Waste Heat Recovery Simulator with corrected function signature
-
 import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,21 +8,26 @@ st.title("Waste Heat Recovery Simulator")
 # Sidebar Inputs for three cases
 st.sidebar.header("Input Parameters")
 
-def get_case_inputs(case_name):
-    st.sidebar.subheader(case_name)
-    exhaust_air_used = st.sidebar.slider(f"{case_name} - % of Exhaust Air Used", 0, 100, 50)
-    exhaust_temp = st.sidebar.slider(f"{case_name} - Exhaust Temperature (°C)", 100, 600, 300)
-    recovery_efficiency = st.sidebar.slider(f"{case_name} - Recovery System Efficiency (%)", 0, 100, 70)
-    base_energy = st.sidebar.slider(f"{case_name} - Base Energy Consumption (kWh/ton)", 500, 2000, 1000)
-    return exhaust_air_used, exhaust_temp, recovery_efficiency, base_energy
+st.sidebar.subheader("Case 1")
+exhaust_air_used1 = st.sidebar.slider("Exhaust Air Used (%) - Case 1", 0, 100, 50)
+exhaust_temp1 = st.sidebar.slider("Exhaust Temperature (°C) - Case 1", 100, 600, 300)
+recovery_efficiency1 = st.sidebar.slider("Recovery Efficiency (%) - Case 1", 0, 100, 70)
+base_energy1 = st.sidebar.slider("Base Energy Consumption (kWh/ton) - Case 1", 500, 2000, 1000)
 
-case1 = get_case_inputs("Case 1")
-case2 = get_case_inputs("Case 2")
-case3 = get_case_inputs("Case 3")
+st.sidebar.subheader("Case 2")
+exhaust_air_used2 = st.sidebar.slider("Exhaust Air Used (%) - Case 2", 0, 100, 60)
+exhaust_temp2 = st.sidebar.slider("Exhaust Temperature (°C) - Case 2", 100, 600, 350)
+recovery_efficiency2 = st.sidebar.slider("Recovery Efficiency (%) - Case 2", 0, 100, 75)
+base_energy2 = st.sidebar.slider("Base Energy Consumption (kWh/ton) - Case 2", 500, 2000, 1200)
 
-# Constants
-electrical_cost_per_kwh = 10  # INR
-thermal_cost_per_kwh = 1.2    # INR
+st.sidebar.subheader("Case 3")
+exhaust_air_used3 = st.sidebar.slider("Exhaust Air Used (%) - Case 3", 0, 100, 40)
+exhaust_temp3 = st.sidebar.slider("Exhaust Temperature (°C) - Case 3", 100, 600, 250)
+recovery_efficiency3 = st.sidebar.slider("Recovery Efficiency (%) - Case 3", 0, 100, 65)
+base_energy3 = st.sidebar.slider("Base Energy Consumption (kWh/ton) - Case 3", 500, 2000, 900)
+
+# Fixed thermal energy cost
+thermal_energy_cost = 1.2
 
 # Calculation function
 def calculate_savings(exhaust_air_used, exhaust_temp, recovery_efficiency, base_energy, cost_per_kwh):
@@ -34,38 +37,67 @@ def calculate_savings(exhaust_air_used, exhaust_temp, recovery_efficiency, base_
     return energy_saved, cost_saved
 
 # Calculate for each case
-energy1, cost1 = calculate_savings(*case1, electrical_cost_per_kwh)
-energy2, cost2 = calculate_savings(*case2, electrical_cost_per_kwh)
-energy3, cost3 = calculate_savings(*case3, electrical_cost_per_kwh)
+energy1, cost1 = calculate_savings(exhaust_air_used1, exhaust_temp1, recovery_efficiency1, base_energy1, thermal_energy_cost)
+energy2, cost2 = calculate_savings(exhaust_air_used2, exhaust_temp2, recovery_efficiency2, base_energy2, thermal_energy_cost)
+energy3, cost3 = calculate_savings(exhaust_air_used3, exhaust_temp3, recovery_efficiency3, base_energy3, thermal_energy_cost)
 
-# Display Results Side by Side
+# Display Results
 st.subheader("Simulation Results")
-col1, col2 = st.columns(2)
-with col1:
-    st.metric("Case 1 - Energy Saved (kWh/ton)", f"{energy1:.2f}")
-    st.metric("Case 2 - Energy Saved (kWh/ton)", f"{energy2:.2f}")
-    st.metric("Case 3 - Energy Saved (kWh/ton)", f"{energy3:.2f}")
-with col2:
-    st.metric("Case 1 - Cost Saved (INR/ton)", f"{cost1:.2f}")
-    st.metric("Case 2 - Cost Saved (INR/ton)", f"{cost2:.2f}")
-    st.metric("Case 3 - Cost Saved (INR/ton)", f"{cost3:.2f}")
 
-# Visualization: Combo Line Chart
-st.subheader("Waste Heat Recovery Impact")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("### Case 1")
+    st.markdown(f"**Input Parameters:**")
+    st.markdown(f"- Exhaust Air Used: {exhaust_air_used1}%")
+    st.markdown(f"- Exhaust Temperature: {exhaust_temp1}°C")
+    st.markdown(f"- Recovery Efficiency: {recovery_efficiency1}%")
+    st.markdown(f"- Base Energy: {base_energy1} kWh/ton")
+    st.markdown(f"**Output:**")
+    st.metric("Energy Saved (kWh/ton)", f"{energy1:.2f}")
+    st.metric("Cost Saved (INR/ton)", f"{cost1:.2f}")
+
+with col2:
+    st.markdown("### Case 2")
+    st.markdown(f"**Input Parameters:**")
+    st.markdown(f"- Exhaust Air Used: {exhaust_air_used2}%")
+    st.markdown(f"- Exhaust Temperature: {exhaust_temp2}°C")
+    st.markdown(f"- Recovery Efficiency: {recovery_efficiency2}%")
+    st.markdown(f"- Base Energy: {base_energy2} kWh/ton")
+    st.markdown(f"**Output:**")
+    st.metric("Energy Saved (kWh/ton)", f"{energy2:.2f}")
+    st.metric("Cost Saved (INR/ton)", f"{cost2:.2f}")
+
+with col3:
+    st.markdown("### Case 3")
+    st.markdown(f"**Input Parameters:**")
+    st.markdown(f"- Exhaust Air Used: {exhaust_air_used3}%")
+    st.markdown(f"- Exhaust Temperature: {exhaust_temp3}°C")
+    st.markdown(f"- Recovery Efficiency: {recovery_efficiency3}%")
+    st.markdown(f"- Base Energy: {base_energy3} kWh/ton")
+    st.markdown(f"**Output:**")
+    st.metric("Energy Saved (kWh/ton)", f"{energy3:.2f}")
+    st.metric("Cost Saved (INR/ton)", f"{cost3:.2f}")
+
+# Bar Chart Visualization
+labels = ['Case 1', 'Case 2', 'Case 3']
+energy_values = [energy1, energy2, energy3]
+cost_values = [cost1, cost2, cost3]
+
+x = np.arange(len(labels))  # label locations
+width = 0.35  # width of the bars
 
 fig, ax1 = plt.subplots()
-
-# Energy Saved Line (Left Axis)
-ax1.set_xlabel("Cases")
-ax1.set_ylabel("Energy Saved (kWh/ton)", color='tab:blue')
-ax1.plot(["Case 1", "Case 2", "Case 3"], [energy1, energy2, energy3], marker='o', color='tab:blue', label='Energy Saved')
-ax1.tick_params(axis='y', labelcolor='tab:blue')
-
-# Cost Saved Line (Right Axis)
+bar1 = ax1.bar(x - width/2, energy_values, width, label='Energy Saved (kWh/ton)', color='orange')
 ax2 = ax1.twinx()
-ax2.set_ylabel("Cost Saved (INR/ton)", color='tab:green')
-ax2.plot(["Case 1", "Case 2", "Case 3"], [cost1, cost2, cost3], marker='s', color='tab:green', label='Cost Saved')
-ax2.tick_params(axis='y', labelcolor='tab:green')
+bar2 = ax2.bar(x + width/2, cost_values, width, label='Cost Saved (INR/ton)', color='green')
 
-fig.tight_layout()
+ax1.set_xlabel('Cases')
+ax1.set_ylabel('Energy Saved (kWh/ton)', color='orange')
+ax2.set_ylabel('Cost Saved (INR/ton)', color='green')
+ax1.set_title('Waste Heat Recovery Impact')
+ax1.set_xticks(x)
+ax1.set_xticklabels(labels)
+fig.legend(loc='upper center', bbox_to_anchor=(0.5, 1.1), ncol=2)
+
 st.pyplot(fig)
