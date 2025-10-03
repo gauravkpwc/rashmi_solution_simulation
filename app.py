@@ -8,67 +8,71 @@ st.title("Waste Heat Recovery Simulator")
 # Sidebar Inputs for three cases
 st.sidebar.header("Input Parameters")
 
-def get_case_inputs(case_name):
-    st.sidebar.subheader(case_name)
-    exhaust_air_used = st.sidebar.slider(f"{case_name} - % of Exhaust Air Used", 0, 100, 50)
-    exhaust_temp = st.sidebar.slider(f"{case_name} - Exhaust Temperature (°C)", 100, 600, 300)
-    recovery_efficiency = st.sidebar.slider(f"{case_name} - Recovery System Efficiency (%)", 0, 100, 70)
-    base_energy = st.sidebar.slider(f"{case_name} - Base Energy Consumption (kWh/ton)", 500, 2000, 1000)
-    return exhaust_air_used, exhaust_temp, recovery_efficiency, base_energy
+st.sidebar.subheader("Case 1")
+exhaust_air_used1 = st.sidebar.slider("Exhaust Air Used (%) - Case 1", 0, 100, 50)
+exhaust_temp1 = st.sidebar.slider("Exhaust Temperature (°C) - Case 1", 100, 600, 300)
+recovery_efficiency1 = st.sidebar.slider("Recovery Efficiency (%) - Case 1", 0, 100, 70)
+base_energy1 = st.sidebar.slider("Base Energy Consumption (kWh/ton) - Case 1", 500, 2000, 1000)
 
-# Get inputs for each case
-case1 = get_case_inputs("Case 1")
-case2 = get_case_inputs("Case 2")
-case3 = get_case_inputs("Case 3")
+st.sidebar.subheader("Case 2")
+exhaust_air_used2 = st.sidebar.slider("Exhaust Air Used (%) - Case 2", 0, 100, 60)
+exhaust_temp2 = st.sidebar.slider("Exhaust Temperature (°C) - Case 2", 100, 600, 350)
+recovery_efficiency2 = st.sidebar.slider("Recovery Efficiency (%) - Case 2", 0, 100, 75)
+base_energy2 = st.sidebar.slider("Base Energy Consumption (kWh/ton) - Case 2", 500, 2000, 1200)
 
-# Fixed energy cost
+st.sidebar.subheader("Case 3")
+exhaust_air_used3 = st.sidebar.slider("Exhaust Air Used (%) - Case 3", 0, 100, 70)
+exhaust_temp3 = st.sidebar.slider("Exhaust Temperature (°C) - Case 3", 100, 600, 400)
+recovery_efficiency3 = st.sidebar.slider("Recovery Efficiency (%) - Case 3", 0, 100, 80)
+base_energy3 = st.sidebar.slider("Base Energy Consumption (kWh/ton) - Case 3", 500, 2000, 1500)
+
+# Fixed thermal energy cost
 thermal_energy_cost = 1.2
 
 # Calculation function
-def calculate_savings(exhaust_air_used, exhaust_temp, recovery_efficiency, base_energy, cost_per_kwh):
+def calculate_savings(exhaust_air_used, recovery_efficiency, base_energy, cost_per_kwh):
     usable_energy_fraction = (exhaust_air_used / 100) * (recovery_efficiency / 100)
     energy_saved = base_energy * usable_energy_fraction
     cost_saved = energy_saved * cost_per_kwh
-    return energy_saved, cost_saved
+    return round(energy_saved, 1), round(cost_saved, 1)
 
 # Calculate for each case
-energy1, cost1 = calculate_savings(*case1, thermal_energy_cost)
-energy2, cost2 = calculate_savings(*case2, thermal_energy_cost)
-energy3, cost3 = calculate_savings(*case3, thermal_energy_cost)
+energy1, cost1 = calculate_savings(exhaust_air_used1, recovery_efficiency1, base_energy1, thermal_energy_cost)
+energy2, cost2 = calculate_savings(exhaust_air_used2, recovery_efficiency2, base_energy2, thermal_energy_cost)
+energy3, cost3 = calculate_savings(exhaust_air_used3, recovery_efficiency3, base_energy3, thermal_energy_cost)
 
 # Prepare data for table
 data = {
     "Case 1": {
-        "Exhaust Air Used (%)": case1[0],
-        "Exhaust Temperature (°C)": case1[1],
-        "Recovery Efficiency (%)": case1[2],
-        "Base Energy (kWh/ton)": case1[3],
+        "Exhaust Air Used (%)": exhaust_air_used1,
+        "Exhaust Temperature (°C)": exhaust_temp1,
+        "Recovery Efficiency (%)": recovery_efficiency1,
+        "Base Energy (kWh/ton)": base_energy1,
         "Energy Saved (kWh/ton)": energy1,
         "Cost Saved (INR/ton)": cost1
     },
     "Case 2": {
-        "Exhaust Air Used (%)": case2[0],
-        "Exhaust Temperature (°C)": case2[1],
-        "Recovery Efficiency (%)": case2[2],
-        "Base Energy (kWh/ton)": case2[3],
+        "Exhaust Air Used (%)": exhaust_air_used2,
+        "Exhaust Temperature (°C)": exhaust_temp2,
+        "Recovery Efficiency (%)": recovery_efficiency2,
+        "Base Energy (kWh/ton)": base_energy2,
         "Energy Saved (kWh/ton)": energy2,
         "Cost Saved (INR/ton)": cost2
     },
     "Case 3": {
-        "Exhaust Air Used (%)": case3[0],
-        "Exhaust Temperature (°C)": case3[1],
-        "Recovery Efficiency (%)": case3[2],
-        "Base Energy (kWh/ton)": case3[3],
+        "Exhaust Air Used (%)": exhaust_air_used3,
+        "Exhaust Temperature (°C)": exhaust_temp3,
+        "Recovery Efficiency (%)": recovery_efficiency3,
+        "Base Energy (kWh/ton)": base_energy3,
         "Energy Saved (kWh/ton)": energy3,
         "Cost Saved (INR/ton)": cost3
     }
 }
 
-# Create DataFrame and transpose
-df = pd.DataFrame(data)
-df = df.round(1).T  # Round to 1 decimal and transpose
+# Convert to DataFrame and transpose
+df = pd.DataFrame(data).round(1).astype(str).transpose()
 
-# Display table with black font styling
+# Display table
 st.subheader("Simulation Summary Table")
 st.dataframe(df.style.set_properties(**{'color': 'black'}))
 
@@ -80,5 +84,5 @@ costs = [cost1, cost2, cost3]
 colors = ['#FD5108', '#FE7C39', '#FFAA72']
 ax.bar(cases, costs, color=colors)
 ax.set_ylabel("Cost Saved (INR/ton)")
-ax.set_title("Cost Saved by Case")
+ax.set_title("Cost Saved per Case")
 st.pyplot(fig)
