@@ -21,9 +21,8 @@ case1 = get_case_inputs("Case 1")
 case2 = get_case_inputs("Case 2")
 case3 = get_case_inputs("Case 3")
 
-# Fixed cost values
-electrical_cost_per_kwh = 10
-thermal_cost_per_kwh = 1.2
+# Fixed energy cost
+thermal_energy_cost = 1.2
 
 # Calculation function
 def calculate_savings(exhaust_air_used, exhaust_temp, recovery_efficiency, base_energy, cost_per_kwh):
@@ -33,9 +32,9 @@ def calculate_savings(exhaust_air_used, exhaust_temp, recovery_efficiency, base_
     return energy_saved, cost_saved
 
 # Calculate for each case
-energy1, cost1 = calculate_savings(*case1, electrical_cost_per_kwh)
-energy2, cost2 = calculate_savings(*case2, electrical_cost_per_kwh)
-energy3, cost3 = calculate_savings(*case3, electrical_cost_per_kwh)
+energy1, cost1 = calculate_savings(*case1, thermal_energy_cost)
+energy2, cost2 = calculate_savings(*case2, thermal_energy_cost)
+energy3, cost3 = calculate_savings(*case3, thermal_energy_cost)
 
 # Prepare data for table
 data = {
@@ -67,10 +66,10 @@ data = {
 
 # Create DataFrame and transpose
 df = pd.DataFrame(data)
-df = df.round(1).transpose()
+df = df.round(1).T  # Round to 1 decimal and transpose
 
-# Display table with black font
-st.subheader("Simulation Summary")
+# Display table with black font styling
+st.subheader("Simulation Summary Table")
 st.dataframe(df.style.set_properties(**{'color': 'black'}))
 
 # Bar chart for cost saved
@@ -81,5 +80,5 @@ costs = [cost1, cost2, cost3]
 colors = ['#FD5108', '#FE7C39', '#FFAA72']
 ax.bar(cases, costs, color=colors)
 ax.set_ylabel("Cost Saved (INR/ton)")
-ax.set_title("Cost Saved Across Cases")
+ax.set_title("Cost Saved by Case")
 st.pyplot(fig)
